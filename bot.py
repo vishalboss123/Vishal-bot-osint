@@ -8,7 +8,7 @@ bot = telebot.TeleBot(BOT_TOKEN)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "👋 Welcome to the OSINT Lookup Bot!\n\nSend me any phone number and I'll try to find public data related to it.")
+    bot.reply_to(message, "👋 Welcome to the VISHAL OSINT Lookup Bot!\n\nSend me any phone number and I'll try to find public data related to it.")
 
 @bot.message_handler(func=lambda message: True)
 def handle_number(message):
