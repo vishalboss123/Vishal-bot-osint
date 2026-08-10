@@ -1,7 +1,7 @@
 import telebot
 import requests
 
-BOT_TOKEN = '8247727223:AAEEejrWpNO2YrkYSJxKefz8U5LowLheIZE'
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 API_URL = 'https://osintclodcode.onrender.com/?num='
 
 bot = telebot.TeleBot(BOT_TOKEN)
