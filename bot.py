@@ -7,6 +7,8 @@ import requests
 import telebot
 
 from pymongo import MongoClient
+import ssl
+
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -58,8 +60,16 @@ bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
 #                       MONGODB
 # ============================================================
 
-mongo_client = MongoClient(MONGO_URI)
 
+
+# MongoDB connection with SSL disabled (fix for Python 3.14)
+mongo_client = MongoClient(
+    MONGO_URI,
+    tls=False,
+    serverSelectionTimeoutMS=30000,
+    connectTimeoutMS=30000,
+    socketTimeoutMS=30000
+)
 db = mongo_client["vishal_num_info"]
 
 users_col = db["users"]
