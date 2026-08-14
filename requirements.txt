@@ -1,2 +1,4 @@
-pyTelegramBotAPI
-requests
+pyTelegramBotAPI==4.29.1
+pymongo==4.15.1
+dnspython==2.8.0
+requests==2.32.5
