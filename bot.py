@@ -61,19 +61,34 @@ bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
 # ============================================================
 
 
+# ============================================================
+#                       MONGODB
+# ============================================================
 
-# MongoDB connection with SSL disabled (fix for Python 3.14)
 mongo_client = MongoClient(
     MONGO_URI,
-    tls=False,
-    serverSelectionTimeoutMS=30000,
-    connectTimeoutMS=30000,
-    socketTimeoutMS=30000
+    tls=True,
+    serverSelectionTimeoutMS=15000,
+    connectTimeoutMS=15000,
+    socketTimeoutMS=30000,
+    retryWrites=True
 )
-db = mongo_client["vishal_num_info"]
 
+db = mongo_client["vishal_num_info"]
 users_col = db["users"]
 
+
+# ============================================================
+#                  MONGODB CONNECTION TEST
+# ============================================================
+
+try:
+    mongo_client.admin.command("ping")
+    print("✅ MongoDB connected successfully!")
+except Exception as e:
+    print("❌ MongoDB connection failed!")
+    print("ERROR:", e)
+    raise
 
 # ============================================================
 #                    DATABASE HELPERS
