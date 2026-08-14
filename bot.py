@@ -1282,6 +1282,35 @@ def callback_handler(call):
 
 
 # ============================================================
+#                  RENDER HEALTH SERVER
+# ============================================================
+
+from flask import Flask
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def home():
+    return "☠️ VISHAL NUM INFO BOT IS RUNNING ⚡", 200
+
+
+@app.route("/health")
+def health():
+    return "OK", 200
+
+
+def run_health_server():
+    port = int(os.environ.get("PORT", 10000))
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        threaded=True
+    )
+
+
+# ============================================================
 #                       MAIN
 # ============================================================
 
@@ -1292,22 +1321,45 @@ if __name__ == "__main__":
     print("⚡ Starting...")
     print("======================================")
 
+    # --------------------------------------------------------
+    # MongoDB connection test
+    # --------------------------------------------------------
+
     try:
-
         mongo_client.admin.command("ping")
-
         print("✅ MongoDB connected")
-
     except Exception as e:
-
         print("❌ MongoDB connection failed:")
         print(e)
         raise
 
+    # --------------------------------------------------------
+    # Start Render HTTP health server
+    # --------------------------------------------------------
+
+    health_thread = threading.Thread(
+        target=run_health_server,
+        daemon=True
+    )
+
+    health_thread.start()
+
+    print("🌐 Render health server started")
     print("🤖 Bot is running...")
 
-    bot.infinity_polling(
-        skip_pending=False,
-        timeout=30,
-        long_polling_timeout=30
-    )
+    # --------------------------------------------------------
+    # Start Telegram polling
+    # --------------------------------------------------------
+
+    try:
+        bot.infinity_polling(
+            skip_pending=False,
+            timeout=30,
+            long_polling_timeout=30
+        )
+
+    except Exception as e:
+        print("❌ Telegram polling failed:")
+        print(e)
+        traceback.print_exc()
+        raise
