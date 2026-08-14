@@ -7,6 +7,8 @@ import requests
 import telebot
 
 from pymongo import MongoClient
+from flask import Flask
+import threading
 import ssl
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -1285,7 +1287,7 @@ def callback_handler(call):
 #                  RENDER HEALTH SERVER
 # ============================================================
 
-from flask import Flask
+
 
 app = Flask(__name__)
 
