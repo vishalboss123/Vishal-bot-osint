@@ -36,3 +36,4 @@ def handle_number(message):
         bot.send_message(message.chat.id, final_result, parse_mode="Markdown")
 
     except Exception as e:
+        bot.send_message(message.chat.id, f"❌ Error: {str(e)}")
