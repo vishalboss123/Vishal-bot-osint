@@ -961,27 +961,29 @@ Set <code>AUTHORIZED_API_URL</code> in Render Environment Variables.
             pass
 
         result_text = f"""
-📞 <b>乂 𝐕ɪsʜᴀʟ 𝐍ᴜᴍ 𝐈ɴғᴏ 乂</b>
-━━━━━━━━━━━━━━━━━━━━━━
+        📞 <b>乂 𝐕ɪsʜᴀʟ 𝐍ᴜᴍ 𝐈ɴғᴏ 乂</b>
 
-📱 <b>𝐍ᴜᴍʙᴇʀ:</b>
-<code>{number}</code>
+        ━━━━━━━━━━━━━━━━━━━━━━
 
-📡 <b>𝐀ᴘɪ 𝐒ᴛᴀᴛᴜs:</b>
-<code>{response.status_code}</code>
+        📱 <b>𝐍ᴜᴍʙᴇʀ:</b>
+        <code>{number}</code>
 
-━━━━━━━━━━━━━━━━━━━━━━
+        📡 <b>𝐀ᴘɪ 𝐒ᴛᴀᴛᴜs:</b>
+        <code>{response.status_code}</code>
 
-<pre>{json_result}</pre>
+        ━━━━━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━━━━━
+        📄 <b>𝐑ᴇsᴜʟᴛ:</b>
 
-💎 <b>𝐑ᴇᴍᴀɪɴɪɴɢ 𝐂ʀᴇᴅɪᴛs:</b>
-<code>{get_credits(user_id)}</code>
+        <pre>{json_result}</pre>
 
-⚡ <b>𝐑ᴇǫᴜᴇsᴛ 𝐂ᴏᴍᴘʟᴇᴛᴇ</b>
-"""
+        ━━━━━━━━━━━━━━━━━━━━━━
 
+        💎 <b>𝐑ᴇᴍᴀɪɴɪɴɢ 𝐂ʀᴇᴅɪᴛs:</b>
+        <code>{get_credits(user_id)}</code>
+
+        ⚡ <b>𝐑ᴇǫᴜᴇsᴛ 𝐂ᴏᴍᴘʟᴇᴛᴇ</b>
+        """
         sent = bot.send_message(
             message.chat.id,
             result_text
