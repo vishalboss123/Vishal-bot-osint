@@ -265,8 +265,6 @@ def start_text(user):
 💰 <code>/credits</code> — 𝐂ʜᴇᴄᴋ 𝐂ʀᴇᴅɪᴛs
 📞 <code>/num &lt;number&gt;</code> — 𝐀ᴜᴛʜᴏʀɪᴢᴇᴅ 𝐋ᴏᴏᴋᴜᴘ
 🎁 <code>/referral</code> — 𝐑ᴇғᴇʀ &amp; 𝐄ᴀʀɴ
-🔄 <code>/reset &lt;user_id&gt;</code> — 𝐎ᴡɴᴇʀ 𝐎ɴʟʏ
-➕ <code>/addcredits &lt;user_id&gt; &lt;amount&gt;</code> — 𝐎ᴡɴᴇʀ 𝐎ɴʟʏ
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 📱 <b>𝐐ᴜɪᴄᴋ 𝐀ᴄᴄᴇss</b>
@@ -939,35 +937,20 @@ Set <code>AUTHORIZED_API_URL</code> in Render Environment Variables.
             timeout=20
         )
 
-        response.raise_for_status()
+        print("API STATUS:", response.status_code)
+        print("API RESPONSE:", response.text)
 
-        data = response.json()
+        try:
+            data = response.json()
 
-        # Keep output generic and JSON formatted.
-        safe_result = {
-            "status": True,
-            "result": data
-        }
+            json_result = json.dumps(
+                data,
+                indent=4,
+                ensure_ascii=False
+            )
 
-        json_result = json.dumps(
-            safe_result,
-            indent=4,
-            ensure_ascii=False
-        )
-
-        result_text = f"""
-📞 <b>乂 𝐕ɪsʜᴀʟ 𝐍ᴜᴍ 𝐈ɴғᴏ 乂</b>
-━━━━━━━━━━━━━━━━━━━━━━
-
-<pre><code class="language-json">{json_result}</code></pre>
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-💎 <b>𝐑ᴇᴍᴀɪɴɪɴɢ 𝐂ʀᴇᴅɪᴛs:</b>
-<code>{remaining}</code>
-
-⚡ <b>𝐑ᴇǫᴜᴇsᴛ 𝐂ᴏᴍᴘʟᴇᴛᴇ</b>
-"""
+        except ValueError:
+            json_result = response.text
 
         try:
             bot.delete_message(
@@ -977,12 +960,33 @@ Set <code>AUTHORIZED_API_URL</code> in Render Environment Variables.
         except Exception:
             pass
 
+        result_text = f"""
+📞 <b>乂 𝐕ɪsʜᴀʟ 𝐍ᴜᴍ 𝐈ɴғᴏ 乂</b>
+━━━━━━━━━━━━━━━━━━━━━━
+
+📱 <b>𝐍ᴜᴍʙᴇʀ:</b>
+<code>{number}</code>
+
+📡 <b>𝐀ᴘɪ 𝐒ᴛᴀᴛᴜs:</b>
+<code>{response.status_code}</code>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+<pre>{json_result}</pre>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+💎 <b>𝐑ᴇᴍᴀɪɴɪɴɢ 𝐂ʀᴇᴅɪᴛs:</b>
+<code>{get_credits(user_id)}</code>
+
+⚡ <b>𝐑ᴇǫᴜᴇsᴛ 𝐂ᴏᴍᴘʟᴇᴛᴇ</b>
+"""
+
         sent = bot.send_message(
             message.chat.id,
             result_text
         )
 
-        # Auto delete after 30 seconds.
         timer = threading.Timer(
             AUTO_DELETE_SECONDS,
             delete_message_safe,
@@ -994,8 +998,14 @@ Set <code>AUTHORIZED_API_URL</code> in Render Environment Variables.
 
     except Exception as e:
 
-        # Refund credit if authorized API failed.
-        add_credits(user_id, 1)
+        print("========== API ERROR ==========")
+        print("ERROR:", repr(e))
+
+        try:
+            print("STATUS:", response.status_code)
+            print("RAW RESPONSE:", response.text)
+        except Exception:
+            pass
 
         try:
             bot.delete_message(
@@ -1005,21 +1015,35 @@ Set <code>AUTHORIZED_API_URL</code> in Render Environment Variables.
         except Exception:
             pass
 
+        error_text = str(e)
+
         bot.send_message(
             message.chat.id,
             f"""
-❌ <b>𝐑ᴇǫᴜᴇsᴛ 𝐅ᴀɪʟᴇᴅ</b>
+☠️ <b>乂 𝐀ᴘɪ 𝐑ᴇǫᴜᴇsᴛ 𝐅ᴀɪʟᴇᴅ 乂</b>
 
-The request could not be completed.
+━━━━━━━━━━━━━━━━━━━━━━
 
-💎 <b>𝐂ʀᴇᴅɪᴛ 𝐑ᴇғᴜɴᴅᴇᴅ:</b> +1
+⚠️ <b>𝐑ᴇǫᴜᴇsᴛ 𝐂ᴏᴜʟᴅ 𝐍ᴏᴛ 𝐁ᴇ 𝐂ᴏᴍᴘʟᴇᴛᴇᴅ</b>
 
-🔐 <b>𝐒ᴛᴀᴛᴜs:</b> 𝐒ᴀғᴇ
+📡 <b>𝐒ᴛᴀᴛᴜs:</b>
+<code>𝐅ᴀɪʟᴇᴅ</code>
+
+📌 <b>𝐄ʀʀᴏʀ:</b>
+<code>{error_text[:1500]}</code>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+💎 <b>𝐂ʀᴇᴅɪᴛ 𝐔sᴇᴅ:</b>
+<code>1</code>
+
+🔒 <b>𝐍ᴏ 𝐑ᴇғᴜɴᴅ</b>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ <i>𝐓ʀʏ 𝐀ɢᴀɪɴ 𝐋ᴀᴛᴇʀ...</i>
 """
         )
-
-        print("API ERROR:", e)
-        traceback.print_exc()
 
 
 # ============================================================
@@ -1088,40 +1112,54 @@ def num_command(message):
     parts = message.text.split()
 
     if len(parts) != 2:
-
         bot.reply_to(
             message,
             """
-⚠️ <b>𝐔sᴀɢᴇ</b>
+☠️ <b>乂 𝐈ɴᴠᴀʟɪᴅ 𝐂ᴏᴍᴍᴀɴᴅ 乂</b>
+
+━━━━━━━━━━━━━━━━━━━━
+
+⚠️ <b>𝐂ᴏʀʀᴇᴄᴛ 𝐔sᴀɢᴇ</b>
 
 <code>/num 9876543210</code>
+
+━━━━━━━━━━━━━━━━━━━━
+
+📌 <b>𝐎ɴʟʏ 𝟏𝟎-𝐃ɪɢɪᴛ 𝐍ᴜᴍʙᴇʀ 𝐀ᴄᴄᴇᴘᴛᴇᴅ</b>
+
+⚡ <i>𝐏ʟᴇᴀsᴇ 𝐄ɴᴛᴇʀ 𝐓ʜᴇ 𝐍ᴜᴍʙᴇʀ 𝐖ɪᴛʜ 𝐓ʜᴇ /ɴᴜᴍ 𝐂ᴏᴍᴍᴀɴᴅ.</i>
+
+━━━━━━━━━━━━━━━━━━━━
 """
         )
-
         return
 
-    process_number(
-        message,
-        parts[1]
-    )
+    number = parts[1].strip()
 
+    if not number.isdigit() or len(number) != 10:
+        bot.reply_to(
+            message,
+            """
+☠️ <b>乂 𝐈ɴᴠᴀʟɪᴅ 𝐍ᴜᴍʙᴇʀ 乂</b>
 
-# ============================================================
-#                DIRECT 10-DIGIT NUMBER
-# ============================================================
+━━━━━━━━━━━━━━━━━━━━
 
-@bot.message_handler(
-    func=lambda message:
-        bool(message.text)
-        and message.text.isdigit()
-        and len(message.text) == 10
-)
-def direct_number(message):
+❌ <b>𝐄ɴᴛᴇʀ 𝐀 𝐕ᴀʟɪᴅ 𝟏𝟎-𝐃ɪɢɪᴛ 𝐍ᴜᴍʙᴇʀ</b>
 
-    process_number(
-        message,
-        message.text.strip()
-    )
+📌 <b>𝐄xᴀᴍᴘʟᴇ:</b>
+
+<code>/num 9876543210</code>
+
+━━━━━━━━━━━━━━━━━━━━
+
+⚡ <i>𝐃ᴏ 𝐍ᴏᴛ 𝐀ᴅᴅ +𝟗𝟏 𝐎ʀ 𝐒ᴘᴀᴄᴇs.</i>
+
+━━━━━━━━━━━━━━━━━━━━
+"""
+        )
+        return
+
+    process_number(message, number)
 
 
 # ============================================================
